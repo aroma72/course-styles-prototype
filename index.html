@@ -60,6 +60,16 @@ h1{font-size:22px;margin:0 0 4px;text-wrap:balance}
 .pill.blue{background:var(--blue-soft);color:var(--blue-ink)}.pill.green{background:var(--green-soft);color:var(--green)}
 .sc-body p{margin:0;color:var(--muted);font-size:14px}
 .sc-meta{display:flex;flex-wrap:wrap;gap:8px;font-size:13px}
+.ws{border-top:1px solid var(--line-soft);padding-top:10px;display:grid;gap:8px}
+.ws-h{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.ws-who{font-size:14px;margin:0}
+.ws-who span{color:var(--muted)}
+.ws details{font-size:14px}
+.ws summary{cursor:pointer;font-weight:600;color:var(--blue-ink);width:max-content;max-width:100%}
+.ws ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px;color:var(--ink)}
+.script{margin:10px 0 0;padding:10px 12px;border-left:3px solid var(--line);background:var(--code);border-radius:0 8px 8px 0;display:grid;gap:8px}
+.script p{margin:0;font-size:14px;color:var(--ink)}
+.script .read{display:block;font-size:12px;font-style:italic;color:var(--muted)}
 .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end;margin-top:22px}
 .btn{font-family:inherit;font-size:14px;font-weight:600;border-radius:8px;padding:10px 16px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
 .btn.primary{background:var(--blue);border-color:var(--blue);color:#fff}
@@ -124,11 +134,31 @@ const STYLES = [
   { id:'character-arc', label:'Character Arc', def:true, cost:1.5,
     summary:'A story-led explainer: one illustrated character, Ali, is followed through a single real scenario, with painted scenes and animated story moments.',
     bestFor:'Concepts that land best as a story: tools, workflows, before-and-after change.',
-    preview:'previews/character-arc.mp4' },
+    preview:'previews/character-arc.mp4',
+    writing:{ narrator:'A warm mentor tells the story of Ali, an invented character, in the third person.',
+      voice:'Warm, friendly mentor voice, one steady read throughout.',
+      rules:['Leads with the answer, then follows Ali through one real scenario in depth.',
+        'Story arc: the problem, the fix, why it works, the common mistake, the payoff.',
+        'One short spoken sentence per scene, with real numbers on screen.'],
+      sample:[['Self-healing is not a smarter brain; it is a room that catches its own mistakes.'],
+        ['Ali keeps every order in one paper ledger on his shop counter.'],
+        ['He asks his AI helper which orders from last month were never paid.'],
+        ['One date in that request is wrong, so the answer comes back completely blank.'],
+        ['Three weeks later the supplier arrives and drops the unpaid bills on his counter.']] } },
   { id:'motion-graphics', label:'Flat Motion Graphics', def:false, cost:0.5,
     summary:'Flat, colourful motion graphics: bold titles, icons and simple figures, with each skill taught through a named model and walked through on real situations, spoken directly to the learner as "you".',
     bestFor:'People skills, soft skills, frameworks and models, and step-by-step how-tos.',
-    preview:'previews/motion-graphics.mp4' },
+    preview:'previews/motion-graphics.mp4',
+    writing:{ narrator:'A calm, composed woman speaks straight to the learner as "you". No named character.',
+      voice:'Calm and collected with steady energy; each line carries its own emotional cue.',
+      rules:['Every skill is taught through a named model, credited to its author (e.g. SCARF, RASA, GROW).',
+        'At least two real workplace situations are walked through step by step, with the exact words to say.',
+        'Shape: hook, the model, walk-throughs, the common mistake, a three-line recap.'],
+      sample:[['You are a P&C Buddy, and that role is bigger than it first looks.','with a warm, welcoming smile'],
+        ['You care for the person, and you stay fair to the organisation, both at the same time.','calmly and with conviction'],
+        ['Lean only toward the person, and you end up taking sides.','with a gentle note of caution'],
+        ['Say an employee tells you their manager never gives them any feedback.','with empathy'],
+        ['A supporter asks what they have tried, and helps them plan that conversation themselves.','warmly and confidently']] } },
 ];
 
 // Example plan for the motion-graphics style — Course 1 of the P&C outline.
@@ -207,11 +237,20 @@ function step1(){
         <div class="sc-head"><b>${esc(s.label)}</b>${s.def ? '<span class="pill">Default</span>' : '<span class="pill blue">New</span>'}</div>
         <p>${esc(s.summary)}</p>
         <div class="sc-meta"><span class="pill">Best for: ${esc(s.bestFor)}</span><span class="pill green">≈ $${s.cost.toFixed(2)} per video</span></div>
+        <div class="ws">
+          <div class="ws-h">How the script sounds</div>
+          <p class="ws-who">${esc(s.writing.narrator)} <span>${esc(s.writing.voice)}</span></p>
+          <details>
+            <summary>Read a sample script</summary>
+            <ul>${s.writing.rules.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>
+            <div class="script">${s.writing.sample.map(([l, r]) => `<p>“${esc(l)}”${r ? `<span class="read">read ${esc(r)}</span>` : ''}</p>`).join('')}</div>
+          </details>
+        </div>
       </div>
     </div>`).join('')}
   </div>
   <div class="actions"><button class="btn primary" id="next1" type="button" ${state.style ? '' : 'disabled'}>Continue</button></div>
-  ${api(`<p><code>GET /api/v1/styles</code> (no token) returns each style's <code>label</code>, <code>summary</code>, <code>bestFor</code>, <code>estimatedCostPerLessonUsd</code> and <code>previewUrl</code> (<code>/api/v1/styles/:id/preview.mp4</code>, plays in a <code>&lt;video&gt;</code> tag).</p>`)}`;
+  ${api(`<p><code>GET /api/v1/styles</code> (no token) returns each style's <code>label</code>, <code>summary</code>, <code>bestFor</code>, <code>estimatedCostPerLessonUsd</code>, <code>writingStyle</code> (narrator, voice, rules, real sample lines) and <code>previewUrl</code> (<code>/api/v1/styles/:id/preview.mp4</code>, plays in a <code>&lt;video&gt;</code> tag).</p>`)}`;
 }
 function step2(){
   const s = styleOf();
@@ -283,9 +322,13 @@ function render(){
   panel.innerHTML = [null, step1, step2, step3, step4][state.step]();
   if (state.step === 1) {
     panel.querySelectorAll('.style-card').forEach((c) => {
-      const pick = () => { state.style = c.dataset.style; state.planned = false; render(); };
+      const pick = (e) => {
+        if (e && e.target.closest('details')) return;   // reading the sample is not choosing
+        if (state.style === c.dataset.style) return;
+        state.style = c.dataset.style; state.planned = false; render();
+      };
       c.addEventListener('click', pick);
-      c.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(); } });
+      c.addEventListener('keydown', (e) => { if (e.target === c && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); pick(); } });
     });
     const n1 = document.getElementById('next1'); if (n1) n1.addEventListener('click', () => go(2));
   }
